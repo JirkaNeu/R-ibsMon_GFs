@@ -2,14 +2,25 @@ library(readxl)
 library(writexl)
 
 setwd("path_of_file")
-input_jne = "name_of_file.xlsx"
+inputfile_jne = "name_of_file.xlsx"
 
-src_jne = read_xlsx(input_jne, sheet = "Monitoring", col_names = T)
+
+src_jne = read_xlsx(inputfile_jne, sheet = "Monitoring", col_names = T)
 #src_jne = read_xlsx(input_jne, sheet = 2, col_names = T)
 
 gfsdata_df = src_jne[21]
 
+substitute_df = function(){
+    new_df = data.frame(GFs=NA)
+    for (i in 1:25){
+        numbers=paste0(c(sample(1:6, sample(1:6, 1), replace=F)), collapse=", ")
+        new_df[i, 1]=numbers
+    } 
+    #print(new_df)    
+    return(new_df)
+}
 
+#gfsdata_df=new_df
 gfsdata_df = cbind(gfsdata_df, gf1=NA, gf2=NA, gf3=NA, gf4=NA, gf5=NA, gf6=NA)
 
 for (irow in 1:nrow(gfsdata_df)){
