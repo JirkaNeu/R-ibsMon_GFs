@@ -1,26 +1,46 @@
 library(readxl)
 library(writexl)
 
-setwd("path_of_file")
-inputfile_jne = "name_of_file.xlsx"
-
-
-src_jne = read_xlsx(inputfile_jne, sheet = "Monitoring", col_names = T)
-#src_jne = read_xlsx(input_jne, sheet = 2, col_names = T)
-
-gfsdata_df = src_jne[21]
-
 substitute_df = function(){
-    new_df = data.frame(GFs=NA)
-    for (i in 1:25){
-        numbers=paste0(c(sample(1:6, sample(1:6, 1), replace=F)), collapse=", ")
-        new_df[i, 1]=numbers
-    } 
-    #print(new_df)    
-    return(new_df)
+  print("use random data for illustrating...")
+  new_df = data.frame(GFs=NA)
+  for (i in 1:25){
+    numbers = paste0(c(sample(1:6, sample(1:6, 1), replace=F)), collapse=", ")
+    new_df[i, 1] = numbers
+  } 
+  #print(new_df)
+  return(new_df)
 }
 
-#gfsdata_df=new_df
+print_plot = F
+
+res_jne = tryCatch({
+  #----------------------------------------------------------#
+  setwd("path_of_file")
+  inputfile_jne = "name_of_file.xlsx"
+  
+  src_jne = read_xlsx(inputfile_jne, sheet = "Monitoring", col_names = T)
+  #src_jne = read_xlsx(input_jne, sheet = 2, col_names = T)
+  
+  gfsdata_df = src_jne[21]
+  print_plot = T
+  #----------------------------------------------------------#
+},
+error = function(e) {
+  cat("Error: ", conditionMessage(e), "\n")
+  print("...")
+  print_plot = F
+  gfsdata_df = substitute_df()
+  return(gfsdata_df)
+},
+warning = function(w) {
+  cat("Warning: ", conditionMessage(w), "\n")
+}
+)
+
+gfsdata_df = res_jne
+
+
 gfsdata_df = cbind(gfsdata_df, gf1=NA, gf2=NA, gf3=NA, gf4=NA, gf5=NA, gf6=NA)
 
 for (irow in 1:nrow(gfsdata_df)){
@@ -55,15 +75,14 @@ for (irow in 1:nrow(gfsdata_df)){
 sum_gfs = NULL
 for (i in 1:6){
   sum_gfs = append(sum_gfs, sum(na.omit(gfsdata_df[i+1])))
-  #sum(na.omit(gfsdata_df[i+1]))
 }
 
-print(sum_gfs)
+#print(sum_gfs)
 
 light = "#6BA1BB"
 dark = "#005478"
 Header = "Title of Barchart"
-Balken = "Column"
+bars = "Column"
 
 
 #------ base plot ------#
@@ -76,12 +95,14 @@ p0 = barplot(sum_gfs,
         xlab = "",
         ylab = "",
         horiz = F,
-        #names.arg = paste(Balken, 1:6)
+        #names.arg = paste(bars, 1:6)
         )
 #text(p0, y = sum_gfs+2, labels = c(as.character(sum_gfs)))
 text(p0, y = 2, labels = c(paste("GF", 1:6)))
-dev.print(device = png, filename = 'gfs_plot0.png', width = 1000)
-dev.off()
+if (print_plot == T){
+  dev.print(device = png, filename = 'gfs_plot0.png', width = 1000)
+  dev.off()
+}
 
 
 #------ ggplot ------#
@@ -119,7 +140,9 @@ p1 = ggplot(sum_gfs_df, aes(x = xlabs, y = freq)) +
     axis.ticks.y=element_blank()  #remove axis ticks
   )
 plot(p1)
-ggsave("gfs_plot1.png")
+if (print_plot == T){
+  ggsave("gfs_plot1.png")
+}
 
 p2 = ggplot(sum_gfs_df, aes(x = reorder(GF, +freq), y = freq)) + 
   geom_bar(stat = "identity", color = "black", fill=light) +
@@ -142,7 +165,9 @@ p2 = ggplot(sum_gfs_df, aes(x = reorder(GF, +freq), y = freq)) +
   ) + 
   coord_flip()
 plot(p2)
-ggsave("gfs_plot2.png")
+if (print_plot == T){
+  ggsave("gfs_plot2.png")
+}
 
 p3 = ggplot(sum_gfs_df, aes(x = reorder(GF, +freq), y = freq)) + 
   geom_bar(stat = "identity", color = "black", fill=light) +
@@ -165,24 +190,19 @@ p3 = ggplot(sum_gfs_df, aes(x = reorder(GF, +freq), y = freq)) +
   ) + 
   coord_flip()
 plot(p3)
-ggsave("gfs_plot3.png")
-
-
-output_jne = "gfs_jne.xlsx"
-write_xlsx(sum_gfs_df, output_jne)
-
-
-res_jne = tryCatch({
-  #----------------------------------------------------------#  
-  #----------------------------------------------------------#
-},
-error = function(e) {
-  cat("Error: ", conditionMessage(e), "\n")
-},
-warning = function(w) {
-  cat("Warning: ", conditionMessage(w), "\n")
+if (print_plot == T){
+  ggsave("gfs_plot3.png")
 }
-) 
+
+if (print_plot == T){
+  output_jne = "gfs_jne.xlsx"
+  write_xlsx(sum_gfs_df, output_jne)
+} else {
+  print("Someting went wrong, random data used for illustrating - no output saved.")
+}
+
+
+
 
 
 
