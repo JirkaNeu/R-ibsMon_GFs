@@ -8,13 +8,12 @@ substitute_df = function(){
     numbers = paste0(c(sample(1:6, sample(1:6, 1), replace=F)), collapse=", ")
     new_df[i, 1] = numbers
   } 
-  #print(new_df)
   return(new_df)
 }
 
 print_plot = F
 
-res_jne = tryCatch({
+gfsdata_df = tryCatch({
   #----------------------------------------------------------#
   setwd("path_of_file")
   inputfile_jne = "name_of_file.xlsx"
@@ -24,12 +23,12 @@ res_jne = tryCatch({
   
   gfsdata_df = src_jne[21]
   print_plot = T
+  return(gfsdata_df)
   #----------------------------------------------------------#
 },
 error = function(e) {
   cat("Error: ", conditionMessage(e), "\n")
   print("...")
-  print_plot = F
   gfsdata_df = substitute_df()
   return(gfsdata_df)
 },
@@ -38,10 +37,9 @@ warning = function(w) {
 }
 )
 
-gfsdata_df = res_jne
-
 
 gfsdata_df = cbind(gfsdata_df, gf1=NA, gf2=NA, gf3=NA, gf4=NA, gf5=NA, gf6=NA)
+
 
 for (irow in 1:nrow(gfsdata_df)){
   getnums = as.character(gfsdata_df[irow, 1])
@@ -198,7 +196,7 @@ if (print_plot == T){
   output_jne = "gfs_jne.xlsx"
   write_xlsx(sum_gfs_df, output_jne)
 } else {
-  print("Someting went wrong, random data used for illustrating - no output saved.")
+  print("Someting went wrong, random data generated for illustrating - no output saved.")
 }
 
 
