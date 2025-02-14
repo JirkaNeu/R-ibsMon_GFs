@@ -189,7 +189,7 @@ if (print_plot == T){
   output_jne = "gfs_jne.xlsx"
   write_xlsx(sum_gfs_df, output_jne)
 } else {
-  cat("Someting went wrong, input not found. \nRandom data generated for illustrating - no output saved.")
+  cat("Someting went wrong, data not found. \nRandom data generated for illustrating - no output saved.")
 }
 
 
