@@ -14,23 +14,16 @@ substitute_df = function(){
 print_plot = F
 
 gfsdata_df = tryCatch({
-  #----------------------------------------------------------#
   setwd("path_of_file")
   inputfile_jne = "name_of_file.xlsx"
-  
   src_jne = read_xlsx(inputfile_jne, sheet = "Monitoring", col_names = T)
-  #src_jne = read_xlsx(input_jne, sheet = 2, col_names = T)
-  
   gfsdata_df = src_jne[21]
   print_plot = T
-  return(gfsdata_df)
-  #----------------------------------------------------------#
 },
 error = function(e) {
   cat("Error: ", conditionMessage(e), "\n")
   print("...")
   gfsdata_df = substitute_df()
-  return(gfsdata_df)
 },
 warning = function(w) {
   cat("Warning: ", conditionMessage(w), "\n")
@@ -196,7 +189,7 @@ if (print_plot == T){
   output_jne = "gfs_jne.xlsx"
   write_xlsx(sum_gfs_df, output_jne)
 } else {
-  print("Someting went wrong, random data generated for illustrating - no output saved.")
+  cat("Someting went wrong, input not found. \nRandom data generated for illustrating - no output saved.")
 }
 
 
